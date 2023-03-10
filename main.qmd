@@ -1,0 +1,20 @@
+---
+jupyter: python3
+---
+
+```{python}
+from riotwatcher import LolWatcher
+```
+
+```{python}
+# create a file called key.txt with your api key
+with open('key.txt', 'r') as file:
+    api_key = file.readline()
+
+watcher = LolWatcher(api_key)
+my_region = 'na1'
+
+me = watcher.summoner.by_name(my_region, 'Among Us Jimin')
+print(me)
+```
+

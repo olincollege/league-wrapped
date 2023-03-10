@@ -14,7 +14,21 @@ with open('key.txt', 'r') as file:
 watcher = LolWatcher(api_key)
 my_region = 'na1'
 
-me = watcher.summoner.by_name(my_region, 'Among Us Jimin')
-print(me)
+summoner = watcher.summoner.by_name(my_region, 'Among Us Jimin')
+```
+
+```{python}
+summoner['puuid']
+```
+
+```{python}
+watcher.match.matchlist_by_puuid(
+    my_region,
+    summoner['puuid'],
+    0,
+    20,
+    14,
+
+)
 ```
 

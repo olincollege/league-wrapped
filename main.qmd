@@ -11,24 +11,99 @@ from riotwatcher import LolWatcher
 with open('key.txt', 'r') as file:
     api_key = file.readline()
 
-watcher = LolWatcher(api_key)
+# watcher = LolWatcher(api_key)
+watcher = LolWatcher("RGAPI-d97556e0-7644-4b88-9de8-9bd4f7b3853e")
 my_region = 'na1'
 
-summoner = watcher.summoner.by_name(my_region, 'Among Us Jimin')
+# summoner = watcher.summoner.by_name(my_region, 'Among Us Jimin')
+summoner = watcher.summoner.by_name(my_region, 'Duckymomoepic')
 ```
 
 ```{python}
-summoner['puuid']
+puuid_in = summoner['puuid']
+print(puuid_in)
 ```
 
 ```{python}
-watcher.match.matchlist_by_puuid(
-    my_region,
-    summoner['puuid'],
-    0,
-    20,
-    14,
+match_list = watcher.match.matchlist_by_puuid(
+    region = my_region,
+    puuid = puuid_in,
+    count = 10,
+    # queue = 420,
+    # type = 'ranked',
+    start_time = 1647211449,
+    end_time = 1679029395,
+)
 
+print(len(match_list))
+print(match_list)
+```
+
+```{python}
+# test to make list of stats for past x games for Duckymomoepic
+num_deaths = []
+num_kills = []
+champs_played = []                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+cs = []
+ward_score = []
+
+for match in match_list:
+    current_match = watcher.match.by_id(
+    region=my_region,
+    match_id=match
+    )
+    players = current_match["info"]["participants"]
+    for player in players:
+        if player["summonerName"] == "Duckymomoepic":
+            num_deaths.append(player["deaths"])
+            num_kills.append(player["kills"])
+            champs_played.append(player["championName"])
+            cs.append(player["totalMinionsKilled"])
+            ward_score.append(player["visionScore"])
+            
+print(f"Deaths: {num_deaths}")
+print(f"Kills: {num_kills}")
+print(f"Champs: {champs_played}")
+print(f"Cs: {cs}")
+print(f"Vision score: {ward_score}")
+```
+
+```{python}
+match_use = match_list[2]
+ex_match = watcher.match.by_id(
+    region=my_region,
+    match_id=match_use
+)
+# print(ex_match["info"]["participants"][0])
+match_start = ex_match["info"]["gameStartTimestamp"]
+match_end = ex_match["info"]["gameEndTimestamp"]
+match_creation = ex_match["info"]["gameCreation"]
+match_gamemode = ex_match["info"]["gameMode"]
+match_gametype = ex_match["info"]["gameType"]
+print(f"Match length: {match_end-match_start}")
+print(f"Match Creation timestamp: {match_creation}")
+print(f"Gamemode: {match_gamemode}")
+print(f"Gametype: {match_gametype}")
+print(ex_match["info"]["participants"][2]['summonerName'])
+# print(ex_match["info"]["participants"])
+print(ex_match["info"]["queueId"])
+```
+
+```{python}
+ex_match = watcher.match.by_id(
+    region=my_region,
+    match_id=match_use
+)
+players = ex_match["info"]["participants"]
+print("List of players from match:\n")
+for player in players:
+    print(player["summonerName"])
+```
+
+```{python}
+ex_match_timeline = watcher.match.timeline_by_match(
+    region=my_region,
+    match_id=match_use
 )
 ```
 

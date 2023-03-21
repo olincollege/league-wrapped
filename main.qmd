@@ -4,6 +4,8 @@ jupyter: python3
 
 ```{python}
 from riotwatcher import LolWatcher
+import pandas as pd
+from collections import defaultdict
 ```
 
 ```{python}
@@ -12,7 +14,7 @@ with open('key.txt', 'r') as file:
     api_key = file.readline()
 
 # watcher = LolWatcher(api_key)
-watcher = LolWatcher("RGAPI-d97556e0-7644-4b88-9de8-9bd4f7b3853e")
+watcher = LolWatcher("RGAPI-9500dbcf-8a34-496d-956d-94a28bec2851")
 my_region = 'na1'
 
 # summoner = watcher.summoner.by_name(my_region, 'Among Us Jimin')
@@ -41,6 +43,9 @@ print(match_list)
 
 ```{python}
 # test to make list of stats for past x games for Duckymomoepic
+player_stats = defaultdict(list)
+tracked_stats = ["deaths", "kills", "championName", "totalMinionsKilled", "visionScore"]
+
 num_deaths = []
 num_kills = []
 champs_played = []                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
@@ -55,17 +60,34 @@ for match in match_list:
     players = current_match["info"]["participants"]
     for player in players:
         if player["summonerName"] == "Duckymomoepic":
-            num_deaths.append(player["deaths"])
-            num_kills.append(player["kills"])
-            champs_played.append(player["championName"])
-            cs.append(player["totalMinionsKilled"])
-            ward_score.append(player["visionScore"])
+            for stat in player:
+                player_stats[stat].append(player[stat])
+            # num_deaths.append(player["deaths"])
+            # num_kills.append(player["kills"])
+            # champs_played.append(player["championName"])
+            # cs.append(player["totalMinionsKilled"])
+            # ward_score.append(player["visionScore"])
             
-print(f"Deaths: {num_deaths}")
-print(f"Kills: {num_kills}")
-print(f"Champs: {champs_played}")
-print(f"Cs: {cs}")
-print(f"Vision score: {ward_score}")
+# print(f"Deaths: {num_deaths}")
+# print(f"Kills: {num_kills}")
+# print(f"Champs: {champs_played}")
+# print(f"Cs: {cs}")
+# print(f"Vision score: {ward_score}")
+print(player_stats)
+pd.DataFrame(player_stats)
+```
+
+```{python}
+# Make dictionary of data and dataframe
+info_dict = {}
+info_dict["Deaths"] = num_deaths
+info_dict["Kills"] = num_kills
+info_dict["Champs"] = champs_played
+info_dict["Cs"] = cs
+info_dict["Vision Score"] = ward_score
+
+info_df = pd.DataFrame.from_dict(data=info_dict, orient="columns")
+print(info_df)
 ```
 
 ```{python}

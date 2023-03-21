@@ -18,7 +18,8 @@ watcher = LolWatcher("RGAPI-9500dbcf-8a34-496d-956d-94a28bec2851")
 my_region = 'na1'
 
 # summoner = watcher.summoner.by_name(my_region, 'Among Us Jimin')
-summoner = watcher.summoner.by_name(my_region, 'Duckymomoepic')
+player_name = "Among Us Jimin"
+summoner = watcher.summoner.by_name(my_region, player_name)
 ```
 
 ```{python}
@@ -44,6 +45,7 @@ print(match_list)
 ```{python}
 # test to make list of stats for past x games for Duckymomoepic
 player_stats = defaultdict(list)
+player_challenges = defaultdict(list)
 tracked_stats = ["deaths", "kills", "championName", "totalMinionsKilled", "visionScore"]
 
 num_deaths = []
@@ -59,9 +61,21 @@ for match in match_list:
     )
     players = current_match["info"]["participants"]
     for player in players:
-        if player["summonerName"] == "Duckymomoepic":
+        if player["summonerName"] == player_name:
             for stat in player:
-                player_stats[stat].append(player[stat])
+                if stat != "challenges":
+                    player_stats[stat].append(player[stat])
+            for challenge in player["challenges"]:
+                player_challenges[challenge].append(player["challenges"][challenge])
+
+keys_to_remove = []
+
+for challenge in player_challenges:
+    if len(player_challenges[challenge]) < len(player_challenges["abilityUses"]):
+        keys_to_remove.append(challenge)
+
+for key in keys_to_remove:
+    player_challenges.pop(key)
             # num_deaths.append(player["deaths"])
             # num_kills.append(player["kills"])
             # champs_played.append(player["championName"])
@@ -73,59 +87,12 @@ for match in match_list:
 # print(f"Champs: {champs_played}")
 # print(f"Cs: {cs}")
 # print(f"Vision score: {ward_score}")
-print(player_stats)
-pd.DataFrame(player_stats)
+player_stats_df = pd.DataFrame(player_stats)
+player_challenges_df = pd.DataFrame(player_challenges)
+info = pd.concat([player_stats_df, player_challenges_df], axis=1)
+info.to_csv('info.csv')
+
+#btw theres a value for early surrender (gameEndedInEarlySurrender) in match --> info --> participants, remember to filter for remakes
 ```
 
-```{python}
-# Make dictionary of data and dataframe
-info_dict = {}
-info_dict["Deaths"] = num_deaths
-info_dict["Kills"] = num_kills
-info_dict["Champs"] = champs_played
-info_dict["Cs"] = cs
-info_dict["Vision Score"] = ward_score
-
-info_df = pd.DataFrame.from_dict(data=info_dict, orient="columns")
-print(info_df)
-```
-
-```{python}
-match_use = match_list[2]
-ex_match = watcher.match.by_id(
-    region=my_region,
-    match_id=match_use
-)
-# print(ex_match["info"]["participants"][0])
-match_start = ex_match["info"]["gameStartTimestamp"]
-match_end = ex_match["info"]["gameEndTimestamp"]
-match_creation = ex_match["info"]["gameCreation"]
-match_gamemode = ex_match["info"]["gameMode"]
-match_gametype = ex_match["info"]["gameType"]
-print(f"Match length: {match_end-match_start}")
-print(f"Match Creation timestamp: {match_creation}")
-print(f"Gamemode: {match_gamemode}")
-print(f"Gametype: {match_gametype}")
-print(ex_match["info"]["participants"][2]['summonerName'])
-# print(ex_match["info"]["participants"])
-print(ex_match["info"]["queueId"])
-```
-
-```{python}
-ex_match = watcher.match.by_id(
-    region=my_region,
-    match_id=match_use
-)
-players = ex_match["info"]["participants"]
-print("List of players from match:\n")
-for player in players:
-    print(player["summonerName"])
-```
-
-```{python}
-ex_match_timeline = watcher.match.timeline_by_match(
-    region=my_region,
-    match_id=match_use
-)
-```
 

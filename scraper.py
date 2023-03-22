@@ -76,9 +76,16 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
             or current_match["info"]["gameDuration"] < 240
         ):
             continue
-        players = current_match["info"]["participants"]
-        for player in players:
-            if player["summonerName"] == summoner_name:
-                for stat in player:
-                    player_stats[stat].append(player[stat])
+
+        target_player = next(
+            (
+                player
+                for player in current_match["info"]["participants"]
+                if player["summonerName"] == summoner_name
+            )
+        )
+
+        for stat in target_player:
+            player_stats[stat].append(target_player[stat])
+
     return pd.DataFrame(player_stats)

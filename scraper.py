@@ -71,7 +71,10 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
     player_stats = defaultdict(list)
     for match in matchlist:
         current_match = watcher.match.by_id(region=region, match_id=match)
-        if current_match["info"]["gameMode"] != "CLASSIC":
+        if (
+            current_match["info"]["gameMode"] != "CLASSIC"
+            or current_match["info"]["gameDuration"] < 240
+        ):
             continue
         players = current_match["info"]["participants"]
         for player in players:

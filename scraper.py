@@ -109,6 +109,8 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
             regions can be found here: https://developer.riotgames.com/docs/lol
             under "platform routing values"
     """
+    summoner = watcher.summoner.by_name(region, summoner_name)
+
     player_keys = watcher.match.by_id(region, matchlist[0])["info"]["participants"][
         0
     ].keys()
@@ -127,7 +129,7 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
             (
                 player
                 for player in current_match["info"]["participants"]
-                if player["summonerName"] == summoner_name
+                if player["puuid"] == summoner["puuid"]
             )
         )
 

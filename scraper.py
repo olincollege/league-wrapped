@@ -66,7 +66,8 @@ def get_season_matchlist(watcher, summoner_name, region):
 
 def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
     """
-    Scrapes and concatenates data from matches into a Pandas DataFrame
+    Scrapes and concatenates data from matches into a Pandas DataFrame and logs
+    DataFrame to .csv file throughout scraping.
 
     Args:
         watcher: A LolWatcher object holding an API key

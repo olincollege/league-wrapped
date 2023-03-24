@@ -109,13 +109,18 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
             regions can be found here: https://developer.riotgames.com/docs/lol
             under "platform routing values"
     """
-    player_stats = defaultdict(list)
-    for match in matchlist:
-        current_match = watcher.match.by_id(region=region, match_id=match)
+    player_keys = watcher.match.by_id(region, matchlist[0])["info"]["participants"][
+        0
+    ].keys()
+    player_stats = pd.DataFrame(index=matchlist, columns=player_keys)
+
+    for match_id in matchlist:
+        current_match = watcher.match.by_id(region, match_id)
         if (
             current_match["info"]["gameMode"] != "CLASSIC"
             or current_match["info"]["gameDuration"] < 240
         ):
+            player_stats = player_stats.drop([match_id])
             continue
 
         target_player = next(
@@ -126,7 +131,8 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
             )
         )
 
-        for stat in target_player:
-            player_stats[stat].append(target_player[stat])
+        player_stats.loc[match_id] = target_player
 
-    return pd.DataFrame(player_stats)
+        player_stats.to_csv(f"{summoner_name}.csv")
+
+    return player_stats

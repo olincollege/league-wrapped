@@ -113,7 +113,7 @@ for champ in horrible_kdas[1:]:
     r = requests.get(image_url)
     pilImage = Image.open(BytesIO(r.content))
     pilImage = Image.open(BytesIO(r.content)).resize((int(167*scale),int(167*scale)))
-    horrible_kda_image = ImageTk.PhotoImage(Image.open(BytesIO(r.content)).resize((int(167*scale),int(167*scale))))
+    horrible_kda_image = ImageTk.PhotoImage(pilImage)
     hkda_images[f"{champ}"] = horrible_kda_image
     canvas.create_image(521*scale, y*scale, anchor=NW, image=horrible_kda_image)
     y += 187
@@ -124,13 +124,13 @@ KDAs = [0.14, 0.17, 0.25, 0.27, 0.34]
 kda_texts = {}
 for i in range(len(horrible_kdas)):
     KDA_text = canvas.create_text(
-                cwidth/4,
+                cwidth/15,
                 ytext,
                 width=cwidth*0.7,
                 text=f"{KDAs[i]}    {horrible_kdas[i]}",
                 fill=BLACK,
                 font=("Arial", 14, "bold"),
-                justify='center'
+                anchor="w"
             )
     ytext+=33
     kda_texts[f"{i}"] = KDA_text
@@ -141,11 +141,96 @@ window.mainloop()
 ```
 
 ```{python}
-import tkinter as tk  
-import tkinter.font as tkf
+# Example Worst Winrates
 
-root = tk.Tk()
-print(tkf.families())
+# Colors
+BLACK = "#000000"
+
+# Set window
+window = Tk()
+window.title("League Wrapped Worst Winrates Example")
+
+# Make canvas
+scale = 0.75
+cwidth = 720*scale
+cheight = 1280*scale
+canvas = Canvas(width=cwidth, height=cheight)
+canvas.grid(row=0, column=0)
+
+# Add background
+pilImage = Image.open("assets/TEMPLATE_winrate.jpg")
+pilImage = pilImage.resize((int(cwidth),int(cheight)))
+bgimg = ImageTk.PhotoImage(pilImage)
+canvas.create_image(cwidth/2, cheight/2, image=bgimg)
+
+
+# Add champ images
+horrible_wr_champs = ["Akali", "Irelia", "Yasuo", "Riven", "Katarina"]
+
+y = 133
+hwr_images = {}
+
+for champ in horrible_wr_champs:
+    image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
+    r = requests.get(image_url)
+    pilImage = Image.open(BytesIO(r.content))
+    pilImage = Image.open(BytesIO(r.content)).resize((int(200*scale),int(200*scale)))
+    horrible_wr_image = ImageTk.PhotoImage(pilImage)
+    hwr_images[f"{champ}"] = horrible_wr_image
+    canvas.create_image(199*scale, y*scale, anchor=NW, image=horrible_wr_image)
+    y += 210
+
+# Add winrate text
+ywrtext = 175
+winrates = [7, 9, 13, 21, 23]
+wr_texts = {}
+for i in range(len(horrible_wr_champs)):
+    wr_text = canvas.create_text(
+                cwidth/4,
+                ywrtext,
+                width=cwidth*0.7,
+                text=f"{winrates[i]}%",
+                fill=BLACK,
+                font=("Arial", 40, "bold"),
+                anchor = "e"
+            )
+    ywrtext+=157
+    wr_texts[f"{i}"] = wr_text
+
+# Add champ text
+ywrtext = 160
+champ_texts = {}
+for i in range(len(horrible_wr_champs)):
+    wr_text = canvas.create_text(
+                3*cwidth/5,
+                ywrtext,
+                width=cwidth*0.7,
+                text=f"{horrible_wr_champs[i]}",
+                fill=BLACK,
+                font=("Arial", 16, "bold"),
+                anchor= "w"
+            )
+    ywrtext+=157
+    champ_texts[f"{i}"] = wr_text
+
+# Add games played text
+ywrtext = 190
+games_played = [117, 87, 22, 12, 18]
+games_texts = {}
+for i in range(len(horrible_wr_champs)):
+    games_text = canvas.create_text(
+                3*cwidth/5,
+                ywrtext,
+                width=cwidth*0.7,
+                text=f"{games_played[i]} games played",
+                fill=BLACK,
+                font=("Arial", 14),
+                anchor= "w"
+            )
+    ywrtext+=157
+    games_texts[f"{i}"] = games_text
+
+window.mainloop()
 ```
 
 ```{python}

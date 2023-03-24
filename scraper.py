@@ -3,11 +3,8 @@ Functions for scraping League of Legends game stats from the Riot API
 """
 
 from riotwatcher import LolWatcher
-from collections import defaultdict
 import pandas as pd
-from time import time
 
-YEAR_SECONDS = 31536000
 S12_START = 1641531600  # 1/07/2022, 00:00:00
 S12_END = 1668488399  # 11/14/2022, 23:59:59
 
@@ -65,35 +62,6 @@ def get_season_matchlist(watcher, summoner_name, region):
 
         start_idx += 100
     return matchlist
-
-
-def get_matchlist(watcher, summoner_name, region, match_count):
-    """
-    Create a list of match ids of matches played by a summoner in the past
-    year. The number of match ids is specified by `match_count`. The match ids
-    are ordered from most recent to least recent.
-
-    Args:
-        watcher: A LolWatcher object holding an API key
-        summoner_name: A string representing the name of the summoner who's
-            matches will be found
-        region: A string representing the region of the summoner
-            regions can be found here: https://developer.riotgames.com/docs/lol
-            under "platform routing values"
-        match_count: An integer representing the number of match ids in the
-            list
-
-    Returns:
-        A list of strings representing the match ids
-    """
-    summoner = watcher.summoner.by_name(region, summoner_name)
-    return watcher.match.matchlist_by_puuid(
-        region=region,
-        puuid=summoner["puuid"],
-        count=match_count,
-        start_time=round(time() - YEAR_SECONDS),
-        end_time=round(time()),
-    )
 
 
 def get_data_from_matchlist(watcher, summoner_name, matchlist, region):

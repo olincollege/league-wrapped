@@ -76,6 +76,9 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
         region: A string representing the region of the summoner
             regions can be found here: https://developer.riotgames.com/docs/lol
             under "platform routing values"
+
+    Returns:
+        A DataFrame holding all player stats from all matches in matchlist
     """
     summoner = watcher.summoner.by_name(region, summoner_name)
 

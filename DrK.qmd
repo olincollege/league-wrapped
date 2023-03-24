@@ -74,7 +74,7 @@ PINK = "#f774c4"
 LIGHT_GREEN = "#12d861"
 ORANGE = "#ff8b1e"
 YELLOW = "#f1ff47"
-BLACK = "000000"
+BLACK = "#000000"
 
 # Set window
 window = Tk()
@@ -88,9 +88,6 @@ canvas = Canvas(width=cwidth, height=cheight, bg="white")
 canvas.grid(row=0, column=0)
 
 # Add background
-# image_url = "http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/Irelia.png"
-# r = requests.get(image_url)
-# pilImage = Image.open(BytesIO(r.content))
 pilImage = Image.open("assets/TEMPLATE_kda.jpg")
 pilImage = pilImage.resize((int(cwidth),int(cheight)))
 bgimg = ImageTk.PhotoImage(pilImage)
@@ -98,10 +95,9 @@ canvas.create_image(cwidth/2, cheight/2, image=bgimg)
 
 
 # Add champ images
-worst_kda = "Akali"
-horrible_kdas = ["Irelia", "Yasuo", "Riven", "Katarina"]
+horrible_kdas = ["Akali", "Irelia", "Yasuo", "Riven", "Katarina"]
 
-image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{worst_kda}.png"
+image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{horrible_kdas[0]}.png"
 r = requests.get(image_url)
 pilImage = Image.open(BytesIO(r.content))
 pilImage = pilImage.resize((int(405*scale),int(408*scale)))
@@ -110,32 +106,9 @@ worst_kda_image = ImageTk.PhotoImage(pilImage)
 canvas.create_image(57*scale, 392*scale, anchor=NW, image=worst_kda_image)
 
 y = 360
-i = 0
 hkda_images = {}
-# for champ in horrible_kdas:
-#     image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
-#     r = requests.get(image_url)
-#     pilImage = Image.open(BytesIO(r.content))
-#     pilImage = pilImage.resize((int(167*scale),int(167*scale)))
-#     horrible_kda_image = ImageTk.PhotoImage(pilImage)
-#     canvas.create_image(521*scale, y*scale, anchor=NW, image=horrible_kda_image)
-#     y += 187
 
-# image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{horrible_kdas[0]}.png"
-# r = requests.get(image_url)
-# pilImage = Image.open(BytesIO(r.content))
-# pilImage = pilImage.resize((int(167*scale),int(167*scale)))
-# # horrible_kda_image = ImageTk.PhotoImage(pilImage)
-# canvas.create_image(521*scale, 360*scale, anchor=NW, image=ImageTk.PhotoImage(pilImage))
-
-# image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{horrible_kdas[1]}.png"
-# r = requests.get(image_url)
-# pilImage = Image.open(BytesIO(r.content))
-# pilImage = pilImage.resize((int(167*scale),int(167*scale)))
-# horrible_kda_image = ImageTk.PhotoImage(pilImage)
-# canvas.create_image(521*scale, 547*scale, anchor=NW, image=horrible_kda_image)
-
-for champ in horrible_kdas:
+for champ in horrible_kdas[1:]:
     image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
     r = requests.get(image_url)
     pilImage = Image.open(BytesIO(r.content))
@@ -144,20 +117,25 @@ for champ in horrible_kdas:
     hkda_images[f"{champ}"] = horrible_kda_image
     canvas.create_image(521*scale, y*scale, anchor=NW, image=horrible_kda_image)
     y += 187
-    i += 1
-
-
 
 # Add text
-# description_text = canvas.create_text(
-#             cwidth/2,
-#             700,
-#             width=cwidth*0.7,
-#             text="In Season 12, your most deaths in one game was 999 deaths on Akali. You filthy inter.",
-#             fill=YELLOW,
-#             font=("Arial", 12),
-#             justify='center'
-#         )
+ytext = 660
+KDAs = [0.14, 0.17, 0.25, 0.27, 0.34]
+kda_texts = {}
+for i in range(len(horrible_kdas)):
+    KDA_text = canvas.create_text(
+                cwidth/4,
+                ytext,
+                width=cwidth*0.7,
+                text=f"{KDAs[i]}    {horrible_kdas[i]}",
+                fill=BLACK,
+                font=("Arial", 14, "bold"),
+                justify='center'
+            )
+    ytext+=33
+    kda_texts[f"{i}"] = KDA_text
+    if i == 4:
+        canvas.itemconfig(KDA_text, fill=YELLOW)
 
 window.mainloop()
 ```

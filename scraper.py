@@ -107,6 +107,6 @@ def get_data_from_matchlist(watcher, summoner_name, matchlist, region):
 
         player_stats.loc[match_id] = target_player
 
-        player_stats.to_csv(f"{summoner_name}.csv")
+        player_stats.to_csv(f"data/{summoner_name}.csv")
 
     return player_stats

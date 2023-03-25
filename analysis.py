@@ -77,3 +77,34 @@ def worst_winrate(player_data):
         )
 
     return sorted(champ_wrs, key=lambda champ_dict: champ_dict["winrate"])[:5]
+
+
+def worst_kda(player_data):
+    """
+    Finds the five champions with the worst KDAs, calculated as
+    total (kills + assists) / deaths
+
+    Args:
+        player_data: A DataFrame holding a player's stats from various matches
+
+    Returns:
+        A list of dictionaries representing the five champions with the worst
+        KDAs. Each dictionary holds the champion's name, KDA, and
+        number of games played
+    """
+    champs_played = player_data["championName"].unique()
+
+    champ_kdas = []
+
+    for champ in champs_played:
+        champ_games = player_data[player_data["championName"] == champ]
+        assists = champ_games["assists"].sum()
+        deaths = champ_games["deaths"].sum()
+        kills = champ_games["kills"].sum()
+        if deaths == 0:
+            continue
+        kda = (kills + assists) / deaths
+        champ_kdas.append(
+            {"champ": champ, "kda": kda, "games_played": len(champ_games)}
+        )
+    return sorted(champ_kdas, key=lambda champ_dict: champ_dict["kda"])[:5]

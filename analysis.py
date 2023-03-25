@@ -76,4 +76,4 @@ def worst_winrate(player_data):
             }
         )
 
-    return sorted(champ_wrs, key=lambda champ_dict: champ_dict["wr"])[:5]
+    return sorted(champ_wrs, key=lambda champ_dict: champ_dict["winrate"])[:5]

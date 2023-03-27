@@ -11,6 +11,49 @@ from tkinter import *
 from PIL import Image, ImageTk
 from io import BytesIO
 import requests
+import analysis as a
+import scraper as s
+import gui as g
+
+```
+
+```{python}
+%load_ext autoreload
+%autoreload 2
+```
+
+```{python}
+# Test functions
+watcher = s.create_watcher("key.txt")
+player = "JackOfNoTrades2"
+my_region = "na1"
+matches = s.get_season_matchlist(watcher=watcher, summoner_name=player, region=my_region)
+```
+
+```{python}
+df = s.get_data_from_matchlist(watcher=watcher, summoner_name=player, matchlist=matches, region=my_region)
+print(df)
+```
+
+```{python}
+# test analysis
+death = a.most_deaths(df)
+kda = a.worst_kda(df)
+wr = a.worst_winrate(df)
+
+print(kda)
+```
+
+```{python}
+g.make_deaths_wrap(death_data=death)
+```
+
+```{python}
+g.make_kda_wrap(kda_data=kda)
+```
+
+```{python}
+g.make_wr_wrap(wr_data=wr)
 ```
 
 ```{python}

@@ -259,7 +259,7 @@ def make_farm_wrap(farm_data):
 
     # Set window
     window = t.Tk()
-    window.title("League Wrapped Worst Deaths Example")
+    window.title("League Wrapped Worst Cs Example")
 
     # Make canvas
     scale = 0.75
@@ -295,6 +295,55 @@ def make_farm_wrap(farm_data):
         width=cwidth * 0.625,
         text=f"In Season 12, your worst cs per minute when not playing support was {round(cs, 1)} on {champ}. Maybe you should play support instead.",
         fill=YELLOW,
+        font=("Arial", 12),
+        justify="center",
+    )
+
+    window.mainloop()
+
+
+def make_vision_wrap(vs_data):
+    # Colors
+    BLACK = "#000000"
+
+    # Set window
+    window = t.Tk()
+    window.title("League Wrapped Vision Score Example")
+
+    # Make canvas
+    scale = 0.75
+    cwidth = 720 * scale
+    cheight = 1280 * scale
+    canvas = t.Canvas(width=cwidth, height=cheight, bg="white")
+    canvas.grid(row=0, column=0)
+
+    # Add background
+    pilImage = Image.open("assets/TEMPLATE_vision.jpg")
+    pilImage = pilImage.resize((int(cwidth), int(cheight)))
+    bgimg = ImageTk.PhotoImage(pilImage)
+    canvas.create_image(cwidth / 2, cheight / 2, image=bgimg)
+
+    # Create champ images
+    champ = vs_data[1]
+    image_url = (
+        f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
+    )
+    r = requests.get(image_url)
+    pilImage = Image.open(BytesIO(r.content))
+    pilImage = pilImage.resize((int(400 * scale), int(400 * scale)))
+    img = ImageTk.PhotoImage(pilImage)
+
+    # Add champ images
+    canvas.create_image(160 * scale, 360 * scale, anchor=t.NW, image=img)
+
+    # Add text
+    vs = vs_data[0]
+    canvas.create_text(
+        cwidth / 2,
+        700,
+        width=cwidth * 0.75,
+        text=f"In Season 12, your worst vision score per minute was {round(vs, 2)} on {champ}. Lee Sin support cosplay is not cool.",
+        fill=BLACK,
         font=("Arial", 12),
         justify="center",
     )

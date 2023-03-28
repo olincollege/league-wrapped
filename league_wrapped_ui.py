@@ -3,9 +3,12 @@ Class for League Wrapped ui
 """
 
 from tkinter import *
+from scraper import *
+from analysis import *
 from io import BytesIO
 from PIL import Image, ImageTk
 import requests
+import time
 
 # Colors
 
@@ -64,10 +67,25 @@ class LoL_wrapped_interface:
         self.user_entry = Entry(master=self.canvas, font=("Arial", 20))
         self.canvas.create_window(self.cwidth / 2, 550, window=self.user_entry)
 
+        # API key text
+        self.canvas.create_text(
+            self.cwidth / 2,
+            600,
+            width=self.cwidth * 0.75,
+            text="Enter API key below:",
+            fill=YELLOW,
+            font=("Arial", 18),
+            justify="center",
+        )
+
+        # API key entry
+        self.key_entry = Entry(master=self.canvas, font=("Arial", 20), show="*")
+        self.canvas.create_window(self.cwidth / 2, 650, window=self.key_entry)
+
         # Region text
         self.canvas.create_text(
             self.cwidth / 2,
-            650,
+            700,
             width=self.cwidth * 0.75,
             text="Select region below:",
             fill=YELLOW,
@@ -75,7 +93,7 @@ class LoL_wrapped_interface:
             justify="center",
         )
 
-        # Username entry
+        # Region Dropdown
         self.regions = {
             "Brazil": "BR1",
             "Europe East": "EUN1",
@@ -91,13 +109,13 @@ class LoL_wrapped_interface:
         }
         self.dropdown_value = StringVar(self.window)
         region_dropdown = OptionMenu(self.canvas, self.dropdown_value, *self.regions)
-        self.canvas.create_window(self.cwidth / 2, 700, window=region_dropdown)
+        self.canvas.create_window(self.cwidth / 2, 750, window=region_dropdown)
 
         # Confirm Button
         confirm = Button(
             master=self.canvas,
             text="Show Me Stats!",
-            command=self.test,
+            command=self.load,
         )
         self.canvas.create_window(self.cwidth / 2, 900, window=confirm)
 
@@ -116,3 +134,23 @@ class LoL_wrapped_interface:
             justify="center",
         )
         # self.canvas.delete("all")
+
+    def load(self):
+        # Clear ui
+        self.canvas.delete("all")
+
+        # Retrieve inputs
+        user = self.user_entry.get()
+        key = self.key_entry.get()
+        region = self.dropdown_value.get()
+
+        # Input description
+        self.canvas.create_text(
+            self.cwidth / 2,
+            600,
+            width=self.cwidth * 0.75,
+            text=f"user: {user}, API key = {key}, region code: {self.regions[region]}",
+            fill=YELLOW,
+            font=("Arial", 18),
+            justify="center",
+        )

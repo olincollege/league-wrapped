@@ -43,7 +43,7 @@ def make_deaths_wrap(death_data):
 
     # Add text
     deaths = death_data[0]
-    description_text = canvas.create_text(
+    canvas.create_text(
         cwidth / 2,
         700,
         width=cwidth * 0.7,
@@ -249,5 +249,54 @@ def make_wr_wrap(wr_data):
         )
         ywrtext += 157
         games_texts[f"{i}"] = games_text
+
+    window.mainloop()
+
+
+def make_farm_wrap(farm_data):
+    # Colors
+    YELLOW = "#f1ff47"
+
+    # Set window
+    window = t.Tk()
+    window.title("League Wrapped Worst Deaths Example")
+
+    # Make canvas
+    scale = 0.75
+    cwidth = 720 * scale
+    cheight = 1280 * scale
+    canvas = t.Canvas(width=cwidth, height=cheight, bg="white")
+    canvas.grid(row=0, column=0)
+
+    # Add background
+    pilImage = Image.open("assets/TEMPLATE_farm.jpg")
+    pilImage = pilImage.resize((int(cwidth), int(cheight)))
+    bgimg = ImageTk.PhotoImage(pilImage)
+    canvas.create_image(cwidth / 2, cheight / 2, image=bgimg)
+
+    # Create champ images
+    champ = farm_data[1]
+    image_url = (
+        f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
+    )
+    r = requests.get(image_url)
+    pilImage = Image.open(BytesIO(r.content))
+    pilImage = pilImage.resize((int(400 * scale), int(400 * scale)))
+    img = ImageTk.PhotoImage(pilImage)
+
+    # Add champ images
+    canvas.create_image(160 * scale, 360 * scale, anchor=t.NW, image=img)
+
+    # Add text
+    cs = farm_data[0]
+    canvas.create_text(
+        cwidth / 2,
+        700,
+        width=cwidth * 0.625,
+        text=f"In Season 12, your worst cs per minute when not playing support was {round(cs, 1)} on {champ}. Maybe you should play support instead.",
+        fill=YELLOW,
+        font=("Arial", 12),
+        justify="center",
+    )
 
     window.mainloop()

@@ -40,8 +40,10 @@ print(df)
 death = a.most_deaths(df)
 kda = a.worst_kda(df)
 wr = a.worst_winrate(df)
+vscore = a.worst_vs(player_data=df)
+cs = a.least_cs(player_data=df)
 
-print(kda)
+print(round(cs[0], 1))
 ```
 
 ```{python}
@@ -57,9 +59,7 @@ g.make_wr_wrap(wr_data=wr)
 ```
 
 ```{python}
-vscore = a.worst_vs(player_data=df)
-cs = a.least_cs(player_data=df)
-print(vscore)
+g.make_farm_wrap(farm_data=cs)
 ```
 
 ```{python}

@@ -115,24 +115,38 @@ def make_kda_wrap(kda_data):
     KDAs = []
 
     for kda in kda_data:
-        kda["kda"] = round(kda["kda"] * 10) / 10
-        KDAs.append(kda["kda"])
+        # if len(str(kda["kda"])) > 4:
+        KDAs.append(round(kda["kda"], 2))
+        # else:
+        #     current_kda = str(kda["kda"]) + "0"
+        #     KDAs.append(round(float(current_kda) * 100) / 100)
 
     kda_texts = {}
     for i in range(len(horrible_kdas)):
-        KDA_text = canvas.create_text(
+        KDA = canvas.create_text(
             cwidth / 15,
             ytext,
             width=cwidth * 0.7,
-            text=f"{KDAs[i]}    {horrible_kdas[i]}",
+            text=f"{KDAs[i]}",
             fill=BLACK,
             font=("Arial", 14, "bold"),
             anchor="w",
         )
-        ytext += 33
-        kda_texts[f"{i}"] = KDA_text
+        KDA_champ = canvas.create_text(
+            cwidth / 4,
+            ytext,
+            width=cwidth * 0.7,
+            text=f"{horrible_kdas[i]}",
+            fill=BLACK,
+            font=("Arial", 14, "bold"),
+            anchor="w",
+        )
+        kda_texts[f"{i}"] = KDA_champ
+        kda_texts[f"{i}"] = KDA
         if i == 4:
-            canvas.itemconfig(KDA_text, fill=YELLOW)
+            canvas.itemconfig(KDA, fill=YELLOW)
+            canvas.itemconfig(KDA_champ, fill=YELLOW)
+        ytext += 33
 
     window.mainloop()
 

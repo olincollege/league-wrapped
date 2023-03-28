@@ -108,3 +108,26 @@ def worst_kda(player_data):
             {"champ": champ, "kda": kda, "games_played": len(champ_games)}
         )
     return sorted(champ_kdas, key=lambda champ_dict: champ_dict["kda"])[:5]
+
+
+def worst_vs(player_data):
+    player_data["vs/m"] = player_data["visionScore"] / player_data["timePlayed"] / 60
+    min_vis_score_per_min = player_data[
+        (player_data["individualPosition"] == "UTILITY")
+        & (player_data["role"] == "SUPPORT")
+        & (player_data["teamPosition"] == "UTILITY")
+    ]["vs/m"].min()
+    champ_name = player_data[player_data["visionScore"] == min_vis_score_per_min][
+        "championName"
+    ]
+
+    player_data["vs/m"] = (player_data["visionScore"]) / (
+        player_data["timePlayed"] / 60
+    )
+    min_vs = player_data[
+        (player_data["individualPosition"] == "UTILITY")
+        & (player_data["role"] == "SUPPORT")
+        & (player_data["teamPosition"] == "UTILITY")
+    ]["vs/m"].min()
+    champ_name = player_data[player_data["vs/m"] == min_vs]["championName"][0]
+    return (min_vs, champ_name)

@@ -25,7 +25,7 @@ import gui as g
 ```{python}
 # Test functions
 watcher = s.create_watcher("key.txt")
-player = "JackOfNoTrades2"
+player = "Duckymomoepic"
 my_region = "na1"
 matches = s.get_season_matchlist(watcher=watcher, summoner_name=player, region=my_region)
 ```
@@ -54,6 +54,12 @@ g.make_kda_wrap(kda_data=kda)
 
 ```{python}
 g.make_wr_wrap(wr_data=wr)
+```
+
+```{python}
+vscore = a.worst_vs(player_data=df)
+cs = a.least_cs(player_data=df)
+print(vscore)
 ```
 
 ```{python}

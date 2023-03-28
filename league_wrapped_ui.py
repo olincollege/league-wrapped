@@ -33,13 +33,28 @@ class LoL_wrapped_interface:
         self.canvas = Canvas(width=self.cwidth, height=self.cheight, bg=BLACK)
         self.canvas.grid(row=0, column=0)
 
-        # Season 12 splash
+        # Load Images
+        self.images = {}
+
+        # Splash
         splash_url = "https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/LOL_2560x1440-98749e0d718e82d27a084941939bc9d3"
         pull = requests.get(splash_url)
         splash = Image.open(BytesIO(pull.content))
         splash = splash.resize((int(1276 * 0.375), int(718 * 0.375)))
         splash_img = ImageTk.PhotoImage(splash)
-        self.canvas.create_image(self.cwidth / 2, self.cheight / 3, image=splash_img)
+        self.images["splash"] = splash_img
+
+        # Poros
+        loading_url = "https://nexus.leagueoflegends.com/wp-content/uploads/2018/11/poros_banner-1_slno1owbdsxulmdvqomp.jpg"
+        pull_load = requests.get(loading_url)
+        loading = Image.open(BytesIO(pull_load.content))
+        loading = loading.resize((int(1276 * 0.375), int(718 * 0.375)))
+        self.images["poros"] = ImageTk.PhotoImage(loading)
+
+        # Create season 12 splash
+        self.image = self.canvas.create_image(
+            self.cwidth / 2, self.cheight / 3, image=self.images["splash"]
+        )
 
         # Title
         self.canvas.create_text(
@@ -122,20 +137,21 @@ class LoL_wrapped_interface:
         self.window.mainloop()
 
     def test(self):
-        user = self.user_entry.get()
-        region = self.dropdown_value.get()
-        self.canvas.create_text(
-            self.cwidth / 2,
-            800,
-            width=self.cwidth * 0.75,
-            text=f"user: {user}, region code: {self.regions[region]}",
-            fill=YELLOW,
-            font=("Arial", 18),
-            justify="center",
-        )
+        # loading_url = (
+        #     "http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/Akali.png"
+        # )
+        # pull_load = requests.get(loading_url)
+        # loading = Image.open(BytesIO(pull_load.content))
+        # loading = loading.resize((int(1276 * 0.375), int(718 * 0.375)))
+        # loading_img = ImageTk.PhotoImage(loading)
+
+        # self.canvas.itemconfig(self.image, image=self.bgimg)
+        pass
+
         # self.canvas.delete("all")
 
     def load(self):
+
         # Clear ui
         self.canvas.delete("all")
 
@@ -143,13 +159,28 @@ class LoL_wrapped_interface:
         user = self.user_entry.get()
         key = self.key_entry.get()
         region = self.dropdown_value.get()
+        region_code = self.regions[region]
+
+        # Loading text
+        self.canvas.create_text(
+            self.cwidth / 2,
+            200,
+            width=self.cwidth * 0.75,
+            text="Please wait while the poros retrieve your worst moments!",
+            fill=YELLOW,
+            font=("Arial", 18),
+            justify="center",
+        )
+
+        # Loading img
+        self.canvas.create_image(self.cwidth / 2, 500, image=self.images["poros"])
 
         # Input description
         self.canvas.create_text(
             self.cwidth / 2,
-            600,
+            700,
             width=self.cwidth * 0.75,
-            text=f"user: {user}, API key = {key}, region code: {self.regions[region]}",
+            text=f"You said...\nUsername: {user}\nAPI key: {key}\nRegion: {region}",
             fill=YELLOW,
             font=("Arial", 18),
             justify="center",

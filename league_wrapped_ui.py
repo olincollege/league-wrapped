@@ -41,10 +41,10 @@ class LoL_wrapped_interface:
         self.canvas = Canvas(width=self.cwidth, height=self.cheight, bg=BLACK)
         self.canvas.grid(row=0, column=0)
 
-        # Load Images
+        # Save images
         self.images = {}
 
-        # Splash
+        # Make splash image
         splash_url = "https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/LOL_2560x1440-98749e0d718e82d27a084941939bc9d3"
         pull = requests.get(splash_url)
         splash = Image.open(BytesIO(pull.content))
@@ -52,15 +52,32 @@ class LoL_wrapped_interface:
         splash_img = ImageTk.PhotoImage(splash)
         self.images["splash"] = splash_img
 
-        # Poros
+        # Make poros/loading image
         loading_url = "https://nexus.leagueoflegends.com/wp-content/uploads/2018/11/poros_banner-1_slno1owbdsxulmdvqomp.jpg"
         pull_load = requests.get(loading_url)
         loading = Image.open(BytesIO(pull_load.content))
         loading = loading.resize((int(1276 * 0.375), int(718 * 0.375)))
         self.images["poros"] = ImageTk.PhotoImage(loading)
 
+        # Make backgrounds
+        death_bg = Image.open("assets/TEMPLATE_deaths.jpg")
+        death_bg = death_bg.resize((int(self.cwidth), int(self.cheight)))
+        self.images["death_bg"] = ImageTk.PhotoImage(death_bg)
+
+        # Make champ images
+        champ_request = requests.get(
+            "http://ddragon.leagueoflegends.com/cdn/13.6.1/data/en_US/champion.json"
+        )
+        champ_dic = champ_request.json()
+        for champ in champ_dic["data"]:
+            image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
+            img_request = requests.get(image_url)
+            champ_img = Image.open(BytesIO(img_request.content))
+            champ_img = champ_img.resize((int(400 * self.SCALE), int(400 * self.SCALE)))
+            self.images[f"{champ}"] = ImageTk.PhotoImage(champ_img)
+
         # Create season 12 splash
-        self.image = self.canvas.create_image(
+        self.canvas.create_image(
             self.cwidth / 2, self.cheight / 3, image=self.images["splash"]
         )
 
@@ -144,20 +161,6 @@ class LoL_wrapped_interface:
 
         self.window.mainloop()
 
-    def test(self):
-        # loading_url = (
-        #     "http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/Akali.png"
-        # )
-        # pull_load = requests.get(loading_url)
-        # loading = Image.open(BytesIO(pull_load.content))
-        # loading = loading.resize((int(1276 * 0.375), int(718 * 0.375)))
-        # loading_img = ImageTk.PhotoImage(loading)
-
-        # self.canvas.itemconfig(self.image, image=self.bgimg)
-        pass
-
-        # self.canvas.delete("all")
-
     def go_loading_screen(self):
 
         # Clear ui
@@ -168,6 +171,17 @@ class LoL_wrapped_interface:
         key = self.key_entry.get()
         region = self.dropdown_value.get()
         self.region_code = self.regions[region]
+
+        # Loading text
+        self.canvas.create_text(
+            self.cwidth / 2,
+            150,
+            width=self.cwidth * 0.75,
+            text="Please wait while the poros retrieve your worst moments!",
+            fill=YELLOW,
+            font=("Arial", 18),
+            justify="center",
+        )
 
         # Loading img
         self.canvas.create_image(self.cwidth / 2, 375, image=self.images["poros"])
@@ -207,19 +221,6 @@ class LoL_wrapped_interface:
         self.canvas.create_window(self.cwidth / 2, 750, window=cont)
 
     def load_player_data(self):
-        # Test
-        print("hi")
-
-        # Loading text
-        self.canvas.create_text(
-            self.cwidth / 2,
-            150,
-            width=self.cwidth * 0.75,
-            text="Please wait while the poros retrieve your worst moments!",
-            fill=YELLOW,
-            font=("Arial", 18),
-            justify="center",
-        )
 
         # Get player data
         self.player_data = get_data_from_matchlist(
@@ -230,32 +231,22 @@ class LoL_wrapped_interface:
         self.canvas.delete("all")
 
         # Show deaths wrap
-        self.show_deaths_rap()
+        self.show_deaths_wrap()
 
-    def show_deaths_rap(self):
+    def show_deaths_wrap(self):
 
         # Analyze for death
         death_data = most_deaths(self.player_data)
 
         # Add background
-        pilImage = Image.open("assets/TEMPLATE_deaths.jpg")
-        pilImage = pilImage.resize((int(self.cwidth), int(self.cheight)))
-        bgimg = ImageTk.PhotoImage(pilImage)
-        self.canvas.create_image(self.cwidth / 2, self.cheight / 2, image=bgimg)
-
-        # Create champ images
-        champ = death_data[1]
-        image_url = (
-            f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
+        self.canvas.create_image(
+            self.cwidth / 2, self.cheight / 2, image=self.images["death_bg"]
         )
-        r = requests.get(image_url)
-        pilImage = Image.open(BytesIO(r.content))
-        pilImage = pilImage.resize((int(400 * self.SCALE), int(400 * self.SCALE)))
-        img = ImageTk.PhotoImage(pilImage)
 
         # Add champ images
+        champ = death_data[1]
         self.canvas.create_image(
-            160 * self.SCALE, 360 * self.SCALE, anchor=NW, image=img
+            160 * self.SCALE, 360 * self.SCALE, anchor=NW, image=self.images[f"{champ}"]
         )
 
         # Add text

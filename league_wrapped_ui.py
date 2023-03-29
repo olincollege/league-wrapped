@@ -5,10 +5,13 @@ Class for League Wrapped ui
 from tkinter import *
 from scraper import *
 from analysis import *
+from scraper import *
+from riotwatcher import LolWatcher
 from io import BytesIO
 from PIL import Image, ImageTk
 import requests
 import time
+import math
 
 # Colors
 
@@ -21,13 +24,18 @@ BLACK = "#000000"
 
 class LoL_wrapped_interface:
     def __init__(self):
-        SCALE = 0.75
+        self.SCALE = 0.75
+        self.player_data = None
+        self.watcher = None
+        self.user = None
+        self.matchlist = None
+        self.region_code = None
 
         # Create window
         self.window = Tk()
         self.window.title("League Wrapped")
-        self.cwidth = 720 * SCALE
-        self.cheight = 1280 * SCALE
+        self.cwidth = 720 * self.SCALE
+        self.cheight = 1280 * self.SCALE
 
         # Create canvas
         self.canvas = Canvas(width=self.cwidth, height=self.cheight, bg=BLACK)
@@ -130,7 +138,7 @@ class LoL_wrapped_interface:
         confirm = Button(
             master=self.canvas,
             text="Show Me Stats!",
-            command=self.load,
+            command=self.go_loading_screen,
         )
         self.canvas.create_window(self.cwidth / 2, 900, window=confirm)
 
@@ -150,21 +158,62 @@ class LoL_wrapped_interface:
 
         # self.canvas.delete("all")
 
-    def load(self):
+    def go_loading_screen(self):
 
         # Clear ui
         self.canvas.delete("all")
 
         # Retrieve inputs
-        user = self.user_entry.get()
+        self.user = self.user_entry.get()
         key = self.key_entry.get()
         region = self.dropdown_value.get()
-        region_code = self.regions[region]
+        self.region_code = self.regions[region]
+
+        # Loading img
+        self.canvas.create_image(self.cwidth / 2, 375, image=self.images["poros"])
+
+        # Input description
+        self.canvas.create_text(
+            self.cwidth / 2,
+            600,
+            width=self.cwidth * 0.75,
+            text=f"You said...\nUsername: {self.user}\nRegion: {region}",
+            fill=YELLOW,
+            font=("Arial", 18),
+            justify="center",
+        )
+
+        # Load data
+        self.watcher = LolWatcher(api_key=key)
+        self.matchlist = get_season_matchlist(
+            watcher=self.watcher, summoner_name=self.user, region=self.region_code
+        )
+
+        # Estimation text
+        self.canvas.create_text(
+            self.cwidth / 2,
+            700,
+            width=self.cwidth * 0.75,
+            text=f"Estimated wait time is {2*(math.ceil(len(self.matchlist)/100)-1)} minutes.\nClick below to continue.",
+            fill=YELLOW,
+            font=("Arial", 18),
+            justify="center",
+        )
+
+        # Continue button
+        cont = Button(
+            master=self.canvas, text="Show Me Stats!", command=self.load_player_data
+        )
+        self.canvas.create_window(self.cwidth / 2, 750, window=cont)
+
+    def load_player_data(self):
+        # Test
+        print("hi")
 
         # Loading text
         self.canvas.create_text(
             self.cwidth / 2,
-            200,
+            150,
             width=self.cwidth * 0.75,
             text="Please wait while the poros retrieve your worst moments!",
             fill=YELLOW,
@@ -172,16 +221,51 @@ class LoL_wrapped_interface:
             justify="center",
         )
 
-        # Loading img
-        self.canvas.create_image(self.cwidth / 2, 500, image=self.images["poros"])
+        # Get player data
+        self.player_data = get_data_from_matchlist(
+            self.watcher, self.user, self.matchlist, self.region_code
+        )
 
-        # Input description
+        # Clear ui
+        self.canvas.delete("all")
+
+        # Show deaths wrap
+        self.show_deaths_rap()
+
+    def show_deaths_rap(self):
+
+        # Analyze for death
+        death_data = most_deaths(self.player_data)
+
+        # Add background
+        pilImage = Image.open("assets/TEMPLATE_deaths.jpg")
+        pilImage = pilImage.resize((int(self.cwidth), int(self.cheight)))
+        bgimg = ImageTk.PhotoImage(pilImage)
+        self.canvas.create_image(self.cwidth / 2, self.cheight / 2, image=bgimg)
+
+        # Create champ images
+        champ = death_data[1]
+        image_url = (
+            f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
+        )
+        r = requests.get(image_url)
+        pilImage = Image.open(BytesIO(r.content))
+        pilImage = pilImage.resize((int(400 * self.SCALE), int(400 * self.SCALE)))
+        img = ImageTk.PhotoImage(pilImage)
+
+        # Add champ images
+        self.canvas.create_image(
+            160 * self.SCALE, 360 * self.SCALE, anchor=NW, image=img
+        )
+
+        # Add text
+        deaths = death_data[0]
         self.canvas.create_text(
             self.cwidth / 2,
             700,
-            width=self.cwidth * 0.75,
-            text=f"You said...\nUsername: {user}\nAPI key: {key}\nRegion: {region}",
+            width=self.cwidth * 0.7,
+            text=f"In Season 12, your most deaths in one game was {deaths} deaths on {champ}. You filthy inter.",
             fill=YELLOW,
-            font=("Arial", 18),
+            font=("Arial", 12),
             justify="center",
         )

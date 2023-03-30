@@ -10,6 +10,7 @@ League Wrapped uses the following packages:
 - tk (tkinter)
 
 These packages are listed in `requirements.txt` and be installed by running the following line in the command prompt:
+
 `pip install -r requirements.txt`
 
 ## Creating an API key

@@ -1,0 +1,122 @@
+---
+execute:
+  enabled: false
+jupyter: python3
+---
+
+```{python}
+%load_ext autoreload
+%autoreload 2
+```
+
+# League Wrapped: Your League of Legends Season in Review
+By Ian Lum and Mo Ampane
+
+## Introduction
+
+Online games are plagued by toxicity. Many try to use gaming as a form of escape and entertainment but are unfortunately met by a barrage of insults, from a harasser who sits miles away in their room, protected by the barrier of the internet. The game “League of Legends” has one of the most notoriously toxic communities, which has driven many gamers to avoid the volatility of playing with random teammates and only play with their friends who they can trust—myself included. However, even people that you may consider friends can still exhibit extremely toxic behavior when gaming.
+
+
+Toxicity is often targeted towards those who appear to be playing poorly, with no regard for external context. The slang term, “diff,” short for “difference” has even been coined by the League of Legends community in order to harass these underperformers, used to indicate a lower level of skill of the underperformer when compared to their respective opponent. Our project strives to be a stepping stone in the path of lessening toxicity by showing a player their worst statistics in order to tell the story that everyone sucks sometimes.
+
+## Setup
+
+In order to run the code below, you will need to compelte the following steps
+
+Creating an API key
+1. Sign in at the [Riot Developer Website](https://developer.riotgames.com/)
+2. Generate/Regenerate an API key
+3. Create a file called `key.txt` in the root directory
+4. Copy the API key into the first line of `key.txt`
+
+Run the following line in the command prompt to install `riotwatcher`
+> pip install riotwatcher
+
+## Methodology
+
+We collected our data through the API of Riot Games, the developer of League of Legends. The League of Legends API works through creating a `LolWatcher` object, which the function `create_watcher` does.
+
+```{python}
+from scraper import create_watcher
+watcher = create_watcher('key.txt')
+```
+
+Next, `get_season_matchlist` creates a list of **match ids** for all matches that a given **summoner** played during **season 12**.
+- Match ids are strings that corresond to a certain match in the API. 
+- Summoners are what League of Legends refers to players as
+- Season 12 refers to the period of time between 1/07/2022 and 11/14/2022. League of Legends splits the game into "seasons", with each "season" lasting just under a year, with the remaining time in the year being the "preseason"
+
+Ian's summoner name, Among Us Jimin, will be used the examples below. Additionally, the game is split into various world regions, in this case the region that Ian plays in is North America, denoted `na1`.
+
+```{python}
+from scraper import get_season_matchlist
+SUMMONER_NAME = 'Among Us Jimin'
+REGION = 'na1'
+matchlist = get_season_matchlist(watcher, SUMMONER_NAME, REGION)
+print(f"Ian played {len(matchlist)} matches in season 12")
+print(f"An example of a match id is {matchlist[0]}")
+```
+
+Finally, `matchlist` is passed into `get_data_from_matchlist`. This function collects statistics for the given summoner in each match of the matchlist and compiles it into DataFrame. This DataFrame is saved to the file `data/[summoner_name].csv`.
+
+The function takes about 2 minutes per 100 matches, due to the rate limiting of the API. Because of this, the function below is commented out so it doesn't run when "Run All" is clicked. If you wish to see the function run, feel free to uncomment and execute the cell below.
+
+```{python}
+# from scraper import get_data_from_matchlist
+# ian_data = get_data_from_matchlist(watcher, SUMMONER_NAME, matchlist, REGION)
+```
+
+Instead, you can load the pre-scraped data using the cell below.
+
+```{python}
+import pandas as pd
+ian_data = pd.read_csv('data/Among Us Jimin.csv', index_col=0)
+```
+
+To get a sense of the data, the head of the data is displayed below.
+
+```{python}
+ian_data.head()
+```
+
+The data was then analyzed to calculate 5 aggregate statistics: The 5 **champions** with the worst **KDA**, the 5 **champions** with the worst **winrate**, the game with the most deaths and the **champion** that was played, the game with the worst **cs/m** and the **champion** that was played, and the game with the worst **vision score** per minute and the **champion** that was played.
+
+Vocabulary:
+- Champion: Playable characters
+- KDA: Short for kill death assist ratio a ratio that is calculated by (kills + assists)/deaths
+- winrate: Percentage of games won, wins/games played
+- cs/m: Short for creep score per minute, an integral part of League of Legends, a higher creep score means you were better at collecting gold, which makes your character more powerful
+- vision score: Another integral part of League of Legends, you are able to scout for enemies by gaining vision, and the efficacy of your vision collection is tracked through vision score
+
+```{python}
+from analysis import worst_kda
+print("The champions that Ian had the worst KDA with were:")
+worst_kda(ian_data)
+```
+
+```{python}
+from analysis import worst_winrate
+print("The champions that Ian had the worst winrate with were:")
+worst_winrate(ian_data)
+```
+
+```{python}
+from analysis import most_deaths
+(deaths, champ) = most_deaths(ian_data)
+print(f"The most deaths Ian had in one game was {deaths}, while playing {champ}")
+```
+
+```{python}
+from analysis import least_cs
+(cs, champ) = least_cs(ian_data)
+print(f"The cs/m Ian had in one game was {round(cs,2)}, while playing {champ}")
+```
+
+```{python}
+from analysis import worst_vs
+(vision, champ) = worst_vs(ian_data)
+print(f"The vision score per minute Ian had in one game was {round(vision,2)}, while playing {champ}")
+```
+
+## Results
+

@@ -37,7 +37,7 @@ Run the following line in the command prompt to install `riotwatcher`
 We collected our data through the API of Riot Games, the developer of League of Legends. The League of Legends API works through creating a `LolWatcher` object, which the function `create_watcher` does.
 
 ```{python}
-from scraper import create_watcher
+from modules.scraper import create_watcher
 watcher = create_watcher('key.txt')
 ```
 
@@ -49,7 +49,7 @@ Next, `get_season_matchlist` creates a list of **match ids** for all matches tha
 Ian's summoner name, Among Us Jimin, will be used the examples below. Additionally, the game is split into various world regions, in this case the region that Ian plays in is North America, denoted `na1`.
 
 ```{python}
-from scraper import get_season_matchlist
+from modules.scraper import get_season_matchlist
 SUMMONER_NAME = 'Among Us Jimin'
 REGION = 'na1'
 matchlist = get_season_matchlist(watcher, SUMMONER_NAME, REGION)
@@ -89,31 +89,31 @@ Vocabulary:
 - vision score: Another integral part of League of Legends, you are able to scout for enemies by gaining vision, and the efficacy of your vision collection is tracked through vision score
 
 ```{python}
-from analysis import worst_kda
+from modules.analysis import worst_kda
 print("The champions that Ian had the worst KDA with were:")
 worst_kda(ian_data)
 ```
 
 ```{python}
-from analysis import worst_winrate
+from modules.analysis import worst_winrate
 print("The champions that Ian had the worst winrate with were:")
 worst_winrate(ian_data)
 ```
 
 ```{python}
-from analysis import most_deaths
+from modules.analysis import most_deaths
 (deaths, champ) = most_deaths(ian_data)
 print(f"The most deaths Ian had in one game was {deaths}, while playing {champ}")
 ```
 
 ```{python}
-from analysis import least_cs
+from modules.analysis import least_cs
 (cs, champ) = least_cs(ian_data)
 print(f"The cs/m Ian had in one game was {round(cs,2)}, while playing {champ}")
 ```
 
 ```{python}
-from analysis import worst_vs
+from modules.analysis import worst_vs
 (vision, champ) = worst_vs(ian_data)
 print(f"The vision score per minute Ian had in one game was {round(vision,2)}, while playing {champ}")
 ```

@@ -1,5 +1,5 @@
 """
-Check the correctness of analysis function
+Check the correctness of analysis functions
 """
 
 import sys

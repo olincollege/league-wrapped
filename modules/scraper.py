@@ -9,7 +9,7 @@ S12_START = 1641531600  # 1/07/2022, 00:00:00
 S12_END = 1668488399  # 11/14/2022, 23:59:59
 
 
-def create_watcher(filepath):
+def create_watcher():
     """
     Creates a LolWatcher object using an API key from a file
 
@@ -20,7 +20,7 @@ def create_watcher(filepath):
     Returns:
         A LolWatcher object using the given API key
     """
-    with open(filepath, "r", encoding="UTF=8") as file:
+    with open("key.txt", "r", encoding="UTF=8") as file:
         api_key = file.readline()
     return LolWatcher(api_key)
 

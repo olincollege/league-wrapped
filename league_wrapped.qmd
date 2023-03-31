@@ -120,14 +120,55 @@ print(f"The vision score per minute Ian had in one game was {round(vision,2)}, w
 
 ## Results
 
-After calculating the five aggregate statistics
+After calculating the five aggregate statistics for a specific player, the stats are then visualized in a spotify wrapped like ui. This is done by typing in the player's user name, pasting in an API key, and selecting the player's region from a drop down menu.
 
 ```{python}
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-img = mpimg.imread('assets/TEMPLATE_deaths.jpg')
-plt.imshow(img)
-plt.axis('off')
-plt.show()
+from modules.ui import show_image
+show_image("assets/Among_Us_Jimin_initial.png")
+```
+
+After clicking the "Show Me Stats!" button, the user is taken to a loading screen. This loading screen clarifies the user's inputs, username and region, and provides an estimated wait time for the necessary data scraping. Clicking "Show Me Stats!" again starts the data scraping.
+
+```{python}
+from modules.ui import show_image
+show_image("assets/Among_Us_Jimin_loading.png")
+```
+
+Once the data scraping is done, the user is taken to a screen visualizing the champ they have gotten the most deaths on in one game and the number of deaths.
+
+```{python}
+from modules.ui import show_image
+show_image("assets/Among_Us_Jimin_deaths.png")
+```
+
+Clicking the "Show Me Stats!" button takes the user to visualizations of their worst KDAs, cs/m, winrates, and vision score in that order. Clicking the button again on the last visualization loops back to the visualization of most deaths. 
+
+```{python}
+from modules.ui import show_image
+show_image("assets/Among_Us_Jimin_kda.png")
+show_image("assets/Among_Us_Jimin_farm.png")
+show_image("assets/Among_Us_Jimin_winrate.png")
+show_image("assets/Among_Us_Jimin_vision.png")
+```
+
+By revealing a player's lowlights, the player is reminded that **everyone** sucks **sometimes**. Resulting in **less** overall toxicity and a more **positive** game environment.
+
+## Conclusion
+
+League Wrapped shows that everyone has their flaws. One ethical implication of our work is that it could be twisted to insult others. However, people insult each other whether or not they have statistics to back them up. The positive affect of showing that everyone has their lows outweighs the possible negative uses.
+
+Throughout the project we learned alot about coworking on a software project. Whether it was using atomic commits for the first time, structuring our repository, or documenting our work in an understandable way, we learned how to cowork more effectively using Github and other methods. We also learned how to use Tkinter to visualize our data. Specifically, implementing the data analysis in real time with the GUI and inserting multiple images pulled from URLs was very challenging. Additionally, cleaning up the code for Pylint was frustrating since overlength lines of code was the primary problem. However, these lines were URLs or text for the GUI, lines that could not be shortened without either making the URL unacessible or messing up the formatting in the GUI.
+
+If we had more time, we would extend our project by adding visualizations of other statistics, such as worst gold, amount of money spent on skins, longest loss streak, and more. We could also improve the GUI by implementing animations and music.
+
+Ultimately, League Wrapped serves as a reminder that no one is perfect and we should embrace it.
+
+## League Wrapped
+
+If you would like to try the GUI yourself, generate/regenerate a Riot API key, uncomment the code below, run it, enter your username, API key, and region, and enjoy your lowlights!
+
+```{python}
+# from modules.ui import LeagueWrappedUI
+# LeagueWrappedUI()
 ```
 

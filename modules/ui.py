@@ -8,6 +8,8 @@ from tkinter import Tk, Canvas, Entry, StringVar, OptionMenu, Button, NW
 from riotwatcher import LolWatcher
 from PIL import Image, ImageTk
 import requests
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 from modules.scraper import get_data_from_matchlist, get_season_matchlist
 from modules.analysis import most_deaths, worst_kda, least_cs, worst_vs, worst_winrate
 
@@ -21,6 +23,19 @@ BLACK = "#000000"
 SCALE = 0.7
 WIDTH = 720 * SCALE
 HEIGHT = 1280 * SCALE
+
+
+def show_image(file_path):
+    """
+    Shows png or jpg file using matplotlib
+
+    Args:
+        file_path: A string representing the path to a png or jpg file.
+    """
+    img = mpimg.imread(file_path)
+    plt.imshow(img)
+    plt.axis("off")
+    plt.show()
 
 
 class LeagueWrappedUI:
@@ -209,6 +224,7 @@ class LeagueWrappedUI:
         self.images["winrate_bg"] = ImageTk.PhotoImage(winrate_bg)
 
         # Make poros/loading image
+        # pylint: disable=line-too-long
         loading_url = "https://nexus.leagueoflegends.com/wp-content/uploads/2018/11/poros_banner-1_slno1owbdsxulmdvqomp.jpg"
         pull = requests.get(loading_url, timeout=30)
         loading = Image.open(BytesIO(pull.content))
@@ -216,6 +232,7 @@ class LeagueWrappedUI:
         self.images["poros"] = ImageTk.PhotoImage(loading)
 
         # Make splash image
+        # pylint: disable=line-too-long
         splash_url = "https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/LOL_2560x1440-98749e0d718e82d27a084941939bc9d3"
         pull = requests.get(splash_url, timeout=30)
         splash = Image.open(BytesIO(pull.content))
@@ -359,8 +376,8 @@ class LeagueWrappedUI:
             WIDTH / 2,
             700,
             width=WIDTH * 0.7,
-            text=f"""In Season 12, your most deaths in one game was {deaths} deaths on {champ}.
-             You filthy inter.""",
+            # pylint: disable=line-too-long
+            text=f"In Season 12, your most deaths in one game was {deaths} deaths on {champ}. You filthy inter.",
             fill=YELLOW,
             font=("Arial", 12),
             justify="center",
@@ -410,7 +427,7 @@ class LeagueWrappedUI:
             y_disp += 187
 
         # Add text
-        ytext = 660
+        ytext = 615
         kda_list = []
 
         for kda in kda_data:
@@ -441,13 +458,13 @@ class LeagueWrappedUI:
             if i == 4:
                 self.canvas.itemconfig(kda_num, fill=YELLOW)
                 self.canvas.itemconfig(kda_champ, fill=YELLOW)
-            ytext += 33
+            ytext += 31
 
         # Continue button
         cont = Button(
             master=self.canvas, text="Show Me Stats!", command=self.show_farm_wrap
         )
-        self.canvas.create_window(WIDTH / 2, 900, window=cont)
+        self.canvas.create_window(WIDTH / 2, 800, window=cont)
 
     def show_farm_wrap(self):
         """
@@ -477,8 +494,8 @@ class LeagueWrappedUI:
             WIDTH / 2,
             700,
             width=WIDTH * 0.7,
-            text=f"""In Season 12, your worst cs per minute when not playing support was
-            {round(farm, 1)} on {champ}. Maybe you should play support instead.""",
+            # pylint: disable=line-too-long
+            text=f"In Season 12, your worst cs per minute when not playing support was {round(farm, 1)} on {champ}. Maybe you should play support instead.",
             fill=YELLOW,
             font=("Arial", 12),
             justify="center",
@@ -524,7 +541,7 @@ class LeagueWrappedUI:
             y_disp += 210
 
         # Add winrate text
-        y_disp = 175
+        y_disp = 150
         winrates = []
         for wr_dic in wr_data:
             winrates.append(round(wr_dic["winrate"] * 100))
@@ -543,14 +560,14 @@ class LeagueWrappedUI:
             wr_texts[f"{i}"] = wr_text
 
         # Add champ text
-        y_disp = 160
+        y_disp = 140
         champ_texts = {}
         for i, champ in enumerate(horrible_wr_champs):
             wr_text = self.canvas.create_text(
                 3 * WIDTH / 5,
                 y_disp,
                 width=WIDTH * 0.7,
-                text=f"{i}",
+                text=f"{champ}",
                 fill=BLACK,
                 font=("Arial", 16, "bold"),
                 anchor="w",
@@ -559,7 +576,7 @@ class LeagueWrappedUI:
             champ_texts[f"{i}"] = wr_text
 
         # Add games played text
-        y_disp = 190
+        y_disp = 170
         games_played = []
         for wr_dic in wr_data:
             games_played.append(wr_dic["games_played"])
@@ -581,7 +598,7 @@ class LeagueWrappedUI:
         cont = Button(
             master=self.canvas, text="Show Me Stats!", command=self.show_vision_wrap
         )
-        self.canvas.create_window(WIDTH / 2, 900, window=cont)
+        self.canvas.create_window(WIDTH / 2, 850, window=cont)
 
     def show_vision_wrap(self):
         """
@@ -612,8 +629,8 @@ class LeagueWrappedUI:
             WIDTH / 2,
             700,
             width=WIDTH * 0.7,
-            text=f"""In Season 12, your worst vision score per minute was {round(vision_score, 2)}
-            on {champ}. Lee Sin support cosplay is not cool.""",
+            # pylint: disable=line-too-long
+            text=f"In Season 12, your worst vision score per minute was {round(vision_score, 2)} on {champ}. Lee Sin support cosplay is not cool.",
             fill=YELLOW,
             font=("Arial", 12),
             justify="center",

@@ -6,10 +6,10 @@ from io import BytesIO
 import math
 from tkinter import Tk, Canvas, Entry, StringVar, OptionMenu, Button, NW
 from riotwatcher import LolWatcher
-import PIL
+from PIL import Image, ImageTk
 import requests
-from scraper import get_data_from_matchlist, get_season_matchlist
-from analysis import most_deaths, worst_kda, least_cs, worst_vs, worst_winrate
+from modules.scraper import get_data_from_matchlist, get_season_matchlist
+from modules.analysis import most_deaths, worst_kda, least_cs, worst_vs, worst_winrate
 
 # Colors
 
@@ -94,8 +94,8 @@ class LeagueWrappedUI:
 
         # Save images
         self.images = {}
-        self.make_images()
         self.make_champ_images()
+        self.make_images()
 
         # Create season 12 splash
         self.canvas.create_image(WIDTH / 2, HEIGHT / 3, image=self.images["splash"])
@@ -170,19 +170,15 @@ class LeagueWrappedUI:
         region_dropdown = OptionMenu(self.canvas, dropdown_value, *regions)
         self.canvas.create_window(WIDTH / 2, 750, window=region_dropdown)
 
-        # Retrieve inputs
-        self.user = user_entry.get()
-        self.key = key_entry.get()
-        region = dropdown_value.get()
-        self.region_code = regions[region]
-
         # Confirm Button
         confirm = Button(
             master=self.canvas,
             text="Show Me Stats!",
-            command=self.go_loading_screen,
+            command=lambda: self.go_loading_screen(
+                user_entry, key_entry, dropdown_value, regions
+            ),
         )
-        self.canvas.create_window(WIDTH / 2, 900, window=confirm)
+        self.canvas.create_window(WIDTH / 2, 800, window=confirm)
 
         window.mainloop()
 
@@ -192,43 +188,40 @@ class LeagueWrappedUI:
         puts them in the images dictionary.
         """
         # Make backgrounds
-        death_bg = PIL.Image.open("assets/TEMPLATE_deaths.jpg")
+        death_bg = Image.open("assets/TEMPLATE_deaths.jpg")
         death_bg = death_bg.resize((int(WIDTH), int(HEIGHT)))
-        self.images["death_bg"] = PIL.ImageTk.PhotoImage(death_bg)
+        self.images["death_bg"] = ImageTk.PhotoImage(death_bg)
 
-        kda_bg = PIL.Image.open("assets/TEMPLATE_kda.jpg")
+        kda_bg = Image.open("assets/TEMPLATE_kda.jpg")
         kda_bg = kda_bg.resize((int(WIDTH), int(HEIGHT)))
-        self.images["kda_bg"] = PIL.ImageTk.PhotoImage(kda_bg)
+        self.images["kda_bg"] = ImageTk.PhotoImage(kda_bg)
 
-        farm_bg = PIL.Image.open("assets/TEMPLATE_farm.jpg")
+        farm_bg = Image.open("assets/TEMPLATE_farm.jpg")
         farm_bg = farm_bg.resize((int(WIDTH), int(HEIGHT)))
-        self.images["farm_bg"] = PIL.ImageTk.PhotoImage(farm_bg)
+        self.images["farm_bg"] = ImageTk.PhotoImage(farm_bg)
 
-        vision_bg = PIL.Image.open("assets/TEMPLATE_vision.jpg")
+        vision_bg = Image.open("assets/TEMPLATE_vision.jpg")
         vision_bg = vision_bg.resize((int(WIDTH), int(HEIGHT)))
-        self.images["vision_bg"] = PIL.ImageTk.PhotoImage(vision_bg)
+        self.images["vision_bg"] = ImageTk.PhotoImage(vision_bg)
 
-        winrate_bg = PIL.Image.open("assets/TEMPLATE_winrate.jpg")
+        winrate_bg = Image.open("assets/TEMPLATE_winrate.jpg")
         winrate_bg = winrate_bg.resize((int(WIDTH), int(HEIGHT)))
-        self.images["winrate_bg"] = PIL.ImageTk.PhotoImage(winrate_bg)
-
-        # Make splash image
-        splash_url = """https://cdn1.epicgames.com/offer/
-            24b9b5e323bc40eea252a10cdd3b2f10/
-            LOL_2560x1440-98749e0d718e82d27a084941939bc9d3"""
-        pull = requests.get(splash_url, timeout=30)
-        splash = PIL.Image.open(BytesIO(pull.content))
-        splash = splash.resize((int(1276 * 0.375), int(718 * 0.375)))
-        splash_img = PIL.ImageTk.PhotoImage(splash)
-        self.images["splash"] = splash_img
+        self.images["winrate_bg"] = ImageTk.PhotoImage(winrate_bg)
 
         # Make poros/loading image
-        loading_url = """https://nexus.leagueoflegends.com/
-                wp-content/uploads/2018/11/poros_banner-1_slno1owbdsxulmdvqomp.jpg"""
+        loading_url = "https://nexus.leagueoflegends.com/wp-content/uploads/2018/11/poros_banner-1_slno1owbdsxulmdvqomp.jpg"
         pull = requests.get(loading_url, timeout=30)
-        loading = PIL.Image.open(BytesIO(pull.content))
+        loading = Image.open(BytesIO(pull.content))
         loading = loading.resize((int(1276 * 0.375), int(718 * 0.375)))
-        self.images["poros"] = PIL.ImageTk.PhotoImage(loading)
+        self.images["poros"] = ImageTk.PhotoImage(loading)
+
+        # Make splash image
+        splash_url = "https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/LOL_2560x1440-98749e0d718e82d27a084941939bc9d3"
+        pull = requests.get(splash_url, timeout=30)
+        splash = Image.open(BytesIO(pull.content))
+        splash = splash.resize((int(1276 * 0.375), int(718 * 0.375)))
+        splash_img = ImageTk.PhotoImage(splash)
+        self.images["splash"] = splash_img
 
     def make_champ_images(self):
         """
@@ -244,27 +237,39 @@ class LeagueWrappedUI:
         for champ in champ_dic["data"]:
             image_url = f"http://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{champ}.png"
             img_request = requests.get(image_url, timeout=30)
-            champ_img = PIL.Image.open(BytesIO(img_request.content))
+            champ_img = Image.open(BytesIO(img_request.content))
 
             champ_img4 = champ_img.resize((int(405 * SCALE), int(405 * SCALE)))
-            self.images[f"{champ}4"] = PIL.ImageTk.PhotoImage(champ_img4)
+            self.images[f"{champ}4"] = ImageTk.PhotoImage(champ_img4)
 
             champ_img3 = champ_img.resize((int(400 * SCALE), int(400 * SCALE)))
-            self.images[f"{champ}3"] = PIL.ImageTk.PhotoImage(champ_img3)
+            self.images[f"{champ}3"] = ImageTk.PhotoImage(champ_img3)
 
             champ_img2 = champ_img.resize((int(200 * SCALE), int(200 * SCALE)))
-            self.images[f"{champ}2"] = PIL.ImageTk.PhotoImage(champ_img2)
+            self.images[f"{champ}2"] = ImageTk.PhotoImage(champ_img2)
 
             champ_img1 = champ_img.resize((int(167 * SCALE), int(167 * SCALE)))
-            self.images[f"{champ}1"] = PIL.ImageTk.PhotoImage(champ_img1)
+            self.images[f"{champ}1"] = ImageTk.PhotoImage(champ_img1)
 
-    def go_loading_screen(self):
+    def go_loading_screen(self, user_entry, key_entry, dropdown_value, regions):
         """
         Shows loading screen, includes input username and region
         code from initial screen.
         """
         # Clear ui
         self.canvas.delete("all")
+
+        # Retrieve inputs
+        self.user = user_entry.get()
+        self.key = key_entry.get()
+        region = dropdown_value.get()
+        self.region_code = regions[region]
+
+        # Load data
+        watcher = LolWatcher(api_key=self.key)
+        self.matchlist = get_season_matchlist(
+            watcher=watcher, summoner_name=self.user, region=self.region_code
+        )
 
         # Loading text
         self.canvas.create_text(
@@ -292,12 +297,12 @@ class LeagueWrappedUI:
         )
 
         # Estimation text
+        eta = 2 * (math.ceil(len(self.matchlist) / 100) - 1)
         self.canvas.create_text(
             WIDTH / 2,
             700,
             width=WIDTH * 0.75,
-            text=f"""Estimated wait time is {2*(math.ceil(len(self.matchlist)/100)-1)} minutes.\n
-            Click below to continue.""",
+            text=f"Estimated wait time is {eta} minutes.\nClick below to continue.",
             fill=YELLOW,
             font=("Arial", 18),
             justify="center",
@@ -305,21 +310,18 @@ class LeagueWrappedUI:
 
         # Continue button
         cont = Button(
-            master=self.canvas, text="Show Me Stats!", command=self.load_player_data
+            master=self.canvas,
+            text="Show Me Stats!",
+            command=lambda: self.load_player_data(watcher),
         )
-        self.canvas.create_window(WIDTH / 2, 750, window=cont)
+        self.canvas.create_window(WIDTH / 2, 800, window=cont)
 
-    def load_player_data(self):
+    def load_player_data(self, watcher):
         """
         Creates watcher object, list of match ids, and dataframe of player data.
         Puts list of match ids in matchlist attribute and dataframe of
         player data in player_data attribute.
         """
-        # Load data
-        watcher = LolWatcher(api_key=self.key)
-        self.matchlist = get_season_matchlist(
-            watcher=watcher, summoner_name=self.user, region=self.region_code
-        )
 
         # Get player data
         self.player_data = get_data_from_matchlist(

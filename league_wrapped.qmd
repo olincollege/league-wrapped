@@ -38,7 +38,7 @@ We collected our data through the API of Riot Games, the developer of League of 
 
 ```{python}
 from modules.scraper import create_watcher
-watcher = create_watcher('key.txt')
+watcher = create_watcher()
 ```
 
 Next, `get_season_matchlist` creates a list of **match ids** for all matches that a given **summoner** played during **season 12**.
@@ -119,4 +119,15 @@ print(f"The vision score per minute Ian had in one game was {round(vision,2)}, w
 ```
 
 ## Results
+
+After calculating the five aggregate statistics
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+img = mpimg.imread('assets/TEMPLATE_deaths.jpg')
+plt.imshow(img)
+plt.axis('off')
+plt.show()
+```
 
